@@ -18,7 +18,7 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 | 2 | 2.1 Prose settings module | done | Verified and committed (`7f7b8dd`) |
 | 2 | 2.2 Heading, count, and marker parsing module | done | Verified and committed (`a4cabb5`) |
 | 3 | 3.1 Public setup, settings lifecycle, and commands | done | Verified and committed (`44a2b7e`) |
-| 4 | 4.1 User documentation and release-facing validation | pending | Depends on 3.1 |
+| 4 | 4.1 User documentation and release-facing validation | done | Verified and committed (`d01627b`); 0.12+ smoke outstanding |
 
 Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when their file scopes remain disjoint. Full/wave-level verification and commits are orchestrator-owned.
 
@@ -58,3 +58,13 @@ Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when the
 - `./tests/run.sh`: pass, 22 tests / 0 failures on Neovim 0.11.6.
 - Deviations: none.
 - Gotchas: FileType autocmd inspection returns two entries for default `markdown` and `text` patterns; command no-heading/no-match warnings appear in test output via `vim.notify`.
+
+### 4.1 — User documentation and release-facing validation
+- Status: done; created `README.md` and `doc/novelist.txt`; committed as `d01627b`.
+- Files: `README.md` (1–177), `doc/novelist.txt` (1–257), `planning/tasks/1.4.1.todo.md` (1–28), `planning/STATE_1.md` (this report).
+- Coverage: install/requirements/setup/options/opt-outs/filetypes/commands/markers/word-count limits/manual smoke; README/help kept consistent.
+- `./tests/run.sh`: pass on Neovim 0.11.6; output: warnings for no previous/next heading and no markers, then `Tests: 22 passed, 0 failed`.
+- Help check: `nvim --headless -u NONE --cmd 'set rtp^=.' -c 'helptags doc' -c 'help novelist' -c 'quitall'` passed with no output; generated `doc/tags` and it was removed.
+- `git diff --check`: pass (no output).
+- Deviations: implementation/tests unchanged; only approved docs/planning files edited.
+- Release gate: Neovim 0.12+ manual smoke remains outstanding; local runtime is 0.11.6.
