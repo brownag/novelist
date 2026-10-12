@@ -15,8 +15,8 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 | Wave | Task | Status | Notes |
 |---|---|---|---|
 | 1 | 1.1 Project foundation and headless test harness | done | Verified and committed on `master` |
-| 2 | 2.1 Prose settings module | done | Verified by task worker; pending orchestration review/commit |
-| 2 | 2.2 Heading, count, and marker parsing module | pending | Depends on 1.1 |
+| 2 | 2.1 Prose settings module | done | Verified and committed (`7f7b8dd`) |
+| 2 | 2.2 Heading, count, and marker parsing module | done | Verified and committed (`a4cabb5`) |
 | 3 | 3.1 Public setup, settings lifecycle, and commands | pending | Depends on 2.1 and 2.2 |
 | 4 | 4.1 User documentation and release-facing validation | pending | Depends on 3.1 |
 
@@ -41,3 +41,10 @@ Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when the
 - Tests: `./tests/run.sh` — pass, 6 tests / 0 failures.
 - Deviations: none.
 - Gotchas: wrap/spell/linebreak/breakindent are window-local in Neovim, so visible-buffer local options use the buffer's window when buffer-scoped setting is unavailable; integration should call during FileType/current-buffer lifecycle.
+
+### 2.2 — Heading, count, and marker parsing module
+- Status: done; implemented `lua/novelist/cockpit.lua` and `tests/unit/cockpit_test.lua`; committed as `a4cabb5`.
+- Files: cockpit module (1–235), tests (1–176), `planning/tasks/1.2.2.todo.md` (checked steps).
+- `./tests/run.sh`: pass, 8 tests / 0 failures; `git diff --check`: pass.
+- Covers ATX hierarchy/sections, navigation, word counts, default/configured markers, exclusions, occurrences and line numbers.
+- Deviations: none. Test file adds `root/lua` to package.path because harness only adds repository root.
