@@ -9,42 +9,24 @@ M.default_markers = {
   todo = 'Unresolved drafting/revision task; may appear anywhere and repeat.',
 }
 
-local function copy_marker_value(value)
-  if type(value) == 'table' then
-    local copy = {}
-    for k, v in pairs(value) do
-      copy[k] = v
-    end
-    return copy
-  end
-  return value
-end
-
 function M.resolve_markers(markers)
   local resolved = {}
 
-  for name, value in pairs(M.default_markers) do
-    resolved[name] = copy_marker_value(value)
+  for name, description in pairs(M.default_markers) do
+    resolved[name] = description
   end
 
   if markers then
-    for name, value in pairs(markers) do
-      if value == false then
+    for name, description in pairs(markers) do
+      if description == false then
         resolved[name] = nil
       else
-        resolved[name] = copy_marker_value(value)
+        resolved[name] = description
       end
     end
   end
 
   return resolved
-end
-
-local function marker_description(value)
-  if type(value) == 'table' then
-    return value.description
-  end
-  return value
 end
 
 local function normalize_markers(markers)
@@ -165,7 +147,7 @@ local function marker_match(line, markers)
     value = value,
     raw = line,
     text = line,
-    description = marker_description(markers[name]),
+    description = markers[name],
   }
 end
 
