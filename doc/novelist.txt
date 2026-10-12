@@ -1,0 +1,257 @@
+*novelist*                      Prose settings and revision cockpit
+
+novelist.txt                    For Neovim 0.12+
+
+==============================================================================
+CONTENTS                                                    *novelist-contents*
+
+1. Overview                                      |novelist-overview|
+2. Requirements and installation                 |novelist-install|
+3. Setup and configuration                       |novelist-setup|
+4. Commands                                      |novelist-commands|
+5. Markers                                       |novelist-markers|
+6. Word-count limitations                        |novelist-word-count|
+7. Manual smoke test                             |novelist-smoke-test|
+
+==============================================================================
+OVERVIEW                                                    *novelist-overview*
+
+`novelist` is a small, dependency-free Neovim plugin for prose writers. It
+combines prose-friendly buffer settings with a lightweight revision cockpit for
+Markdown and plain-text drafts.
+
+It provides automatic local prose options for supported buffers,
+heading-based section navigation, current-section and document word counts, and
+configurable standalone story/revision markers such as `@who:` and `@todo:`.
+
+`novelist` does not infer story meaning automatically, and it does not provide
+grammar or style checking. It installs named commands only; it does not create
+default keymaps.
+
+==============================================================================
+REQUIREMENTS AND INSTALLATION                                *novelist-install*
+
+Requirements:
+
+- Neovim 0.12+ is the release target.
+- No required third-party Neovim plugins or external tools.
+
+Install the repository with your preferred Neovim plugin manager, using the
+manager's normal syntax for a plugin repository. In generic terms: >lua
+
+  -- Add the novelist repository with your plugin manager.
+  -- Then configure it after the plugin is on 'runtimepath':
+  require('novelist').setup()
+<
+
+The runtime plugin calls `require('novelist').setup()` with defaults when it
+loads. Calling `setup()` yourself is safe and updates the active configuration.
+
+The dependency-free test suite can run under the available local Neovim runtime,
+but passing it on an older runtime does not replace the required manual Neovim
+0.12+ smoke test for release validation.
+
+==============================================================================
+SETUP AND CONFIGURATION                                      *novelist-setup*
+
+Default configuration: >lua
+
+  require('novelist').setup({
+    prose = {
+      enabled = true,
+      filetypes = { 'markdown', 'text' },
+      spell = true,
+      spelllang = { 'en_us' },
+      wrap = true,
+      linebreak = true,
+      breakindent = true,
+      textwidth = 0,
+    },
+    markers = {},
+  })
+<
+
+Supported filetypes are `markdown` and `text` by default.
+
+Prose options:
+
+                                                        *novelist-prose-options*
+`prose.enabled`                                      Default: `true`
+        Apply prose settings on supported |FileType| events.
+
+`prose.filetypes`                       Default: `{ 'markdown', 'text' }`
+        Filetypes that receive the prose preset. Replaces the default list when
+        configured.
+
+`prose.spell`                                        Default: `true`
+        Local spell checking value.
+
+`prose.spelllang`                         Default: `{ 'en_us' }`
+        Local spell language list. Tables are applied as comma-separated spell
+        languages.
+
+`prose.wrap`                                         Default: `true`
+        Visual wrapping.
+
+`prose.linebreak`                                    Default: `true`
+        Break wrapped lines at convenient characters when possible.
+
+`prose.breakindent`                                  Default: `true`
+        Preserve indentation visually on wrapped lines.
+
+`prose.textwidth`                                    Default: `0`
+        Do not insert hard wraps into saved text.
+
+Disable automatic prose settings globally: >lua
+
+  require('novelist').setup({
+    prose = { enabled = false },
+  })
+<
+
+Disable automatic prose settings for one buffer before its |FileType| event
+applies: >lua
+
+  vim.b.novelist_disable = true
+<
+
+Markers are configured with `markers`. Entries override the default marker
+descriptions, new names add enabled markers, and `false` disables a marker.
+Marker descriptions are for user-facing text only; marker values in buffers
+remain arbitrary text. >lua
+
+  require('novelist').setup({
+    markers = {
+      who = 'POV first, then other characters present.',
+      thread = 'Revision thread or subplot note.',
+      todo = false, -- disable the default @todo marker
+    },
+  })
+<
+
+==============================================================================
+COMMANDS                                                  *novelist-commands*
+
+                                                        *:NovelistSceneNext*
+:NovelistSceneNext
+        Move to the next Markdown ATX section heading. Warns if there is no
+        next heading.
+
+                                                        *:NovelistScenePrev*
+:NovelistScenePrev
+        Move to the previous Markdown ATX section heading. Warns if there is no
+        previous heading.
+
+                                                        *:NovelistWordCount*
+:NovelistWordCount
+        Report current section words and document words with |vim.notify()|.
+
+                                                        *:NovelistMarkers*
+:NovelistMarkers [name]
+        Put matching marker lines in the quickfix list. Optional [name] filters
+        by marker name, such as `todo`. Opens the quickfix window only when
+        matches exist.
+
+Sections are based on Markdown ATX headings (`#` through `######` followed by
+whitespace). A headingless document is treated as one implicit whole-document
+section for word counts; heading navigation reports that no section heading
+exists.
+
+==============================================================================
+MARKERS                                                    *novelist-markers*
+
+Markers are standalone Markdown/plain-text metadata lines: >text
+
+  @name: value
+<
+
+The marker line may have leading whitespace. Names may contain word characters,
+`_`, and `-`. Only enabled marker names are recognized; unknown or disabled
+marker names are ignored. Inline `@` mentions are not parsed.
+
+Default markers:
+
+`@who`     Viewpoint character first, followed by other important people in the
+           scene. Example: `@who: Mira (POV), Ivo`
+
+`@what`    Central event, conflict, or change in the scene. Example:
+           `@what: Mira discovers the forged letter`
+
+`@where`   Scene location. Example: `@where: North bridge, east tower`
+
+`@when`    Placement in the story chronology. Example:
+           `@when: Winter, year 12`
+
+`@why`     Why the scene matters: its purpose, stakes, or cause in the story.
+           Example: `@why: Forces Mira to choose whether to trust Ivo`
+
+`@todo`    Unresolved drafting/revision task; may appear anywhere and repeat.
+           Example: `@todo: Seed the letter's wax seal earlier`
+
+`@why` means scene purpose or stakes by default. You may write character
+motivation there when useful, but `novelist` treats the value as plain
+writer-authored text.
+
+==============================================================================
+WORD-COUNT LIMITATIONS                                  *novelist-word-count*
+
+Word counts are intentionally simple:
+
+- counts are whitespace-delimited non-empty tokens;
+- recognized standalone marker lines are excluded;
+- section heading text is counted after stripping the leading Markdown heading
+  prefix;
+- other Markdown syntax is not parsed, normalized, or removed;
+- sections are heading boundaries only, not inferred chapters or scenes.
+
+==============================================================================
+MANUAL SMOKE TEST                                      *novelist-smoke-test*
+
+Manual validation on Neovim 0.12+ remains a release gate unless it is actually
+run on that runtime.
+
+1. Install or add this repository to 'runtimepath' with your plugin manager.
+2. Start Neovim 0.12+ and run `:checkhealth` or `:version` to confirm the
+   runtime version.
+3. Open a Markdown buffer and set `:set filetype=markdown` if needed.
+4. Confirm prose settings with: >vim
+
+     :setlocal spell? spelllang? wrap? linebreak? breakindent? textwidth?
+<
+5. Add sample content: >markdown
+
+     # Opening
+     @who: Mira (POV), Ivo
+     Mira finds the forged letter.
+     @todo: Seed the wax seal earlier
+
+     ## Turn
+     Ivo denies everything.
+<
+6. Run `:NovelistWordCount` and confirm it reports section and document counts.
+7. Run `:NovelistSceneNext` and `:NovelistScenePrev` from different lines and
+   confirm cursor movement between headings.
+8. Run `:NovelistMarkers` and `:NovelistMarkers todo`; confirm matching lines
+   appear in quickfix and filtering works.
+9. Optionally set `vim.b.novelist_disable = true` before applying a supported
+   filetype in a new buffer and confirm prose settings are skipped.
+
+Automated checks:
+
+Run the dependency-free headless suite: >sh
+
+  ./tests/run.sh
+<
+
+Help documentation should resolve from the plugin runtime path after help tags
+are generated: >sh
+
+  nvim --headless -u NONE --cmd 'set rtp^=.' -c 'helptags doc' -c 'help novelist' -c 'quitall'
+<
+
+If that command creates `doc/tags` during validation, remove it before
+committing unless the release process explicitly wants generated help tags
+tracked.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
