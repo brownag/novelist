@@ -3,82 +3,16 @@ local h = require('tests.helpers')
 local root = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':p:h:h:h')
 package.path = root .. '/lua/?.lua;' .. root .. '/lua/?/init.lua;' .. package.path
 
+local with_buffer = h.with_buffer
+local get_local = h.get_local_option
+local set_non_prose_values = h.set_non_prose_options
+local assert_non_prose_values = h.assert_non_prose_options
+
 local function require_fresh_novelist(opts)
   package.loaded['novelist'] = nil
   local novelist = require('novelist')
   novelist.setup(opts or {})
   return novelist
-end
-
-local function win_for(bufnr)
-  local winid = vim.fn.bufwinid(bufnr)
-  h.assert_true(winid ~= -1, 'test buffer must be visible')
-  return winid
-end
-
-local function set_local(bufnr, name, value)
-  local ok = pcall(vim.api.nvim_set_option_value, name, value, { buf = bufnr })
-  if not ok then
-    vim.api.nvim_set_option_value(name, value, { win = win_for(bufnr) })
-  end
-end
-
-local function get_local(bufnr, name)
-  local ok, value = pcall(vim.api.nvim_get_option_value, name, { buf = bufnr })
-  if ok then
-    return value
-  end
-  return vim.api.nvim_get_option_value(name, { win = win_for(bufnr) })
-end
-
-local function set_non_prose_values(bufnr)
-  set_local(bufnr, 'spell', false)
-  set_local(bufnr, 'spelllang', 'en_gb')
-  set_local(bufnr, 'wrap', false)
-  set_local(bufnr, 'linebreak', false)
-  set_local(bufnr, 'breakindent', false)
-  set_local(bufnr, 'textwidth', 72)
-end
-
-local function assert_non_prose_values(bufnr)
-  h.assert_false(get_local(bufnr, 'spell'))
-  h.assert_equal('en_gb', get_local(bufnr, 'spelllang'))
-  h.assert_false(get_local(bufnr, 'wrap'))
-  h.assert_false(get_local(bufnr, 'linebreak'))
-  h.assert_false(get_local(bufnr, 'breakindent'))
-  h.assert_equal(72, get_local(bufnr, 'textwidth'))
-end
-
-local function make_buffer(lines, name)
-  local previous = vim.api.nvim_get_current_buf()
-  local bufnr = vim.api.nvim_create_buf(false, true)
-  if name then
-    vim.api.nvim_buf_set_name(bufnr, name)
-  end
-  vim.api.nvim_set_current_buf(bufnr)
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines or { 'Draft text.' })
-  return bufnr, previous
-end
-
-local function cleanup(bufnr, previous)
-  pcall(vim.cmd, 'cclose')
-  if vim.api.nvim_buf_is_valid(previous) then
-    pcall(vim.api.nvim_set_current_buf, previous)
-  end
-  if vim.api.nvim_buf_is_valid(bufnr) then
-    vim.api.nvim_buf_delete(bufnr, { force = true })
-  end
-end
-
-local function with_buffer(lines, fn, name)
-  local bufnr, previous = make_buffer(lines, name)
-  local ok, err = xpcall(function()
-    fn(bufnr)
-  end, debug.traceback)
-  cleanup(bufnr, previous)
-  if not ok then
-    error(err, 0)
-  end
 end
 
 local function qf_window_count()
@@ -253,7 +187,7 @@ h.test('marker command populates quickfix with filename line text and opens only
     vim.cmd('NovelistMarkers why')
     h.assert_equal(0, #vim.fn.getqflist())
     h.assert_equal(0, qf_window_count())
-  end, filename)
+  end, { name = filename, close_quickfix = true })
 end)
 
 h.test('setup installs no default keymaps', function()
