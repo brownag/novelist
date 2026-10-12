@@ -17,7 +17,7 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 | 1 | 1.1 Project foundation and headless test harness | done | Verified and committed on `master` |
 | 2 | 2.1 Prose settings module | done | Verified and committed (`7f7b8dd`) |
 | 2 | 2.2 Heading, count, and marker parsing module | done | Verified and committed (`a4cabb5`) |
-| 3 | 3.1 Public setup, settings lifecycle, and commands | pending | Depends on 2.1 and 2.2 |
+| 3 | 3.1 Public setup, settings lifecycle, and commands | implemented | Uncommitted; review/commit pending |
 | 4 | 4.1 User documentation and release-facing validation | pending | Depends on 3.1 |
 
 Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when their file scopes remain disjoint. Full/wave-level verification and commits are orchestrator-owned.
@@ -48,3 +48,13 @@ Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when the
 - `./tests/run.sh`: pass, 8 tests / 0 failures; `git diff --check`: pass.
 - Covers ATX hierarchy/sections, navigation, word counts, default/configured markers, exclusions, occurrences and line numbers.
 - Deviations: none. Test file adds `root/lua` to package.path because harness only adds repository root.
+
+### 3.1 — Public setup, settings lifecycle, and commands
+- Status: implemented; uncommitted, review pending.
+- Files: `plugin/novelist.lua` (1), `lua/novelist/init.lua` (1–92), `lua/novelist/commands.lua` (1–149), `tests/unit/integration_test.lua` (1–264), `planning/tasks/1.3.1.todo.md` checked.
+- Public API: runtime plugin calls `require('novelist').setup()`; repeated setup updates config and recreates one FileType autocmd per supported filetype pattern.
+- Commands: `NovelistSceneNext`, `NovelistScenePrev`, `NovelistWordCount`, `NovelistMarkers [name]`; no mappings added.
+- Tests added: integration coverage for repeated setup, empty `filetypes={}` replacement, FileType settings, unsupported/opt-out buffers, command navigation/counts/quickfix, no-match handling, and no keymaps.
+- `./tests/run.sh`: pass, 22 tests / 0 failures on Neovim 0.11.6.
+- Deviations: none.
+- Gotchas: FileType autocmd inspection returns two entries for default `markdown` and `text` patterns; command no-heading/no-match warnings appear in test output via `vim.notify`.

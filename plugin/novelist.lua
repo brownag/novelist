@@ -1,0 +1,1 @@
+require('novelist').setup()
