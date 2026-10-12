@@ -14,7 +14,7 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 
 | Wave | Task | Status | Notes |
 |---|---|---|---|
-| 1 | 1.1 Project foundation and headless test harness | done | Harness verified; commit pending branch/dirty-state approval |
+| 1 | 1.1 Project foundation and headless test harness | done | Verified and committed on `master` |
 | 2 | 2.1 Prose settings module | pending | Depends on 1.1 |
 | 2 | 2.2 Heading, count, and marker parsing module | pending | Depends on 1.1 |
 | 3 | 3.1 Public setup, settings lifecycle, and commands | pending | Depends on 2.1 and 2.2 |
@@ -25,7 +25,7 @@ Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when the
 ## Task reports
 
 ### 1.1 — Project foundation and headless test harness
-- Status: done; implementation verified, commit pending Git pre-flight approval.
+- Status: done; verified and committed on `master` (`test: add dependency-free headless harness`).
 - Files: `tests/helpers.lua` (1–68), `tests/run.lua` (1–6), `tests/run.sh` (1–19; executable), `planning/tasks/1.1.todo.md` (checked steps).
 - `./tests/run.sh`: pass, 0 tests / 0 failures; exit 0.
 - Temporary intentional failing test: correctly reported 1 failure and exited 1; removed afterward.
