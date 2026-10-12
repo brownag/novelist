@@ -17,7 +17,7 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 | 1 | 1.1 Project foundation and headless test harness | done | Verified and committed on `master` |
 | 2 | 2.1 Prose settings module | done | Verified and committed (`7f7b8dd`) |
 | 2 | 2.2 Heading, count, and marker parsing module | done | Verified and committed (`a4cabb5`) |
-| 3 | 3.1 Public setup, settings lifecycle, and commands | implemented | Uncommitted; review/commit pending |
+| 3 | 3.1 Public setup, settings lifecycle, and commands | done | Verified and committed (`44a2b7e`) |
 | 4 | 4.1 User documentation and release-facing validation | pending | Depends on 3.1 |
 
 Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when their file scopes remain disjoint. Full/wave-level verification and commits are orchestrator-owned.
@@ -50,7 +50,7 @@ Maximum concurrent workers: 2. Execute tasks in a wave in parallel only when the
 - Deviations: none. Test file adds `root/lua` to package.path because harness only adds repository root.
 
 ### 3.1 — Public setup, settings lifecycle, and commands
-- Status: implemented; uncommitted, review pending.
+- Status: done; verified and committed as `44a2b7e`.
 - Files: `plugin/novelist.lua` (1), `lua/novelist/init.lua` (1–92), `lua/novelist/commands.lua` (1–149), `tests/unit/integration_test.lua` (1–264), `planning/tasks/1.3.1.todo.md` checked.
 - Public API: runtime plugin calls `require('novelist').setup()`; repeated setup updates config and recreates one FileType autocmd per supported filetype pattern.
 - Commands: `NovelistSceneNext`, `NovelistScenePrev`, `NovelistWordCount`, `NovelistMarkers [name]`; no mappings added.
