@@ -25,3 +25,22 @@ Resolve the review’s duplicated test-helper and speculative marker-description
 - Do not commit unless separately requested.
 - Validation: `/opt/nvim-linux-x86_64/bin/nvim --version` reports `NVIM v0.12.6`. A direct headless smoke workflow loaded `plugin/novelist.lua`, applied Markdown defaults (`spell`, `spelllang`, `wrap`, `linebreak`, `breakindent`, `textwidth`), navigated to next/previous headings, ran `:NovelistWordCount` (reported section 4 / document 8 for the sample), and verified `:NovelistMarkers todo` produced the expected quickfix line/text. Output: `Neovim 0.12.6 smoke checks passed`.
 - The first smoke invocation used buffer-scoped option access for window-local `spell` and timed out after the assertion error; the successful rerun used Neovim's buffer/window option fallback, matching the plugin's option handling.
+
+## Follow-up: Git ignore and tracked research files
+
+### 1. Preserve already-separated tracked-file commits
+- [x] Confirm `159ffd0` and `577793e` remain in history as separate commits; do not amend or recreate them.
+
+### 2. Ignore only local Claude workspace data
+- [x] Add `.claude/.gitignore` containing `*` so the ignore rule stays inside `.claude/`.
+- [x] Verify `.claude/` contents are ignored and `reports/` and `research_notes/` remain visible to Git.
+- [x] Force-add and conventionally commit `.claude/.gitignore` (its own `*` pattern may ignore the file itself): `d03e4c9`.
+
+### 3. Track research artifacts
+- [x] Add and commit `reports/` and `research_notes/` as tracked project documentation using conventional commit messages (`2fb0471`, `318c521`).
+- [x] Verify the intended files are committed and no unrelated tracked changes are staged.
+
+## Follow-up notes
+- The two previously modified tracked files are already committed separately: `159ffd0` and `577793e`.
+- Track all files currently under `reports/` (2 Markdown files) and `research_notes/` (6 Markdown files); track only `.claude/.gitignore` under `.claude/`.
+- Leave unrelated modifications untouched and do not amend prior commits.
