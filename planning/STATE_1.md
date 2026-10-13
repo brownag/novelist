@@ -9,6 +9,7 @@ Resume from this file and `planning/EXECUTION_PLAN_1.md`.
 - [x] Confirmed runtime: `/usr/bin/nvim`, version 0.11.6. Target is 0.12+; final target-version smoke validation is outstanding.
 - [x] New headless harness empty-suite baseline: `./tests/run.sh` on Neovim 0.11.6 — 0 passed, 0 failed (exit 0).
 - [x] Baseline established before Wave 2: `./tests/run.sh` passes with 0 tests discovered (0 passed, 0 failed). Neovim 0.12+ validation remains outstanding.
+- [ ] Neovim 0.12.6 is released (2026-10-09). Run the Task 4.1 manual smoke test on the 0.12.6 release (Linux appimage or tarball), not only on 0.11.6.
 
 ## Wave board
 
