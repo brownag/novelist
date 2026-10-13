@@ -35,7 +35,7 @@ Neovim already has several prose-friendly primitives that a plugin can compose i
 
 | Tool | What primary source says | Use for prose/narrative |
 |---|---|---|
-| `preservim/vim-pencil` | Repo README is `README.markdown`; plugin is distributed as a Vim runtime plugin with `autoload/`, `plugin/`, and `doc/` directories.[^pencil-repo] | Likely the closest existing “writing mode” plugin for Vim/Neovim. Because the repo uses classic Vim runtime layout, inspect its docs/config before writing a replacement. |
+| `reedes/vim-pencil` (formerly `preservim/vim-pencil`) | README describes it as a pure Vimscript prose plugin with no dependencies. Repo runtime directory layout was not verified.[^pencil-repo] | Likely the closest existing “writing mode” plugin for Vim/Neovim. Inspect its docs/config before writing a replacement. |
 | Built-in `ftplugin` + options | Neovim docs define filetype plugin layout and prose-related options (`spell`, `wrap`, `linebreak`, `breakindent`, `textwidth`).[^nvim-ftplugin-layout][^nvim-spell][^nvim-wrap] | A small personal prose plugin may only need filetype-local option sets for `markdown`, `text`, `asciidoc`, `org`, etc. |
 
 ### 3. Spelling, grammar, and style checking
@@ -77,7 +77,7 @@ Existing tools catch spelling/grammar/style, but they do not appear to provide a
 - quickfix/location-list views for continuity markers;
 - commands like `:ProseSceneNext`, `:ProsePOV`, `:ProseWordCount`, `:ProseRevisionPass passive|filter|dialogue|sensory`.
 
-Why this gap is real: existing primary docs focus on focus mode, Markdown rendering, note navigation, general grammar/style diagnostics, or organization—not narrative continuity/revision as a first-class workflow.[^goyo][^render-markdown][^obsidian][^telekasten][^ltex-ls][^vale]
+Why this gap appears real (based on a sampled survey of about 15 tools, not an exhaustive one): existing primary docs focus on focus mode, Markdown rendering, note navigation, general grammar/style diagnostics, or organization—not narrative continuity/revision as a first-class workflow.[^goyo][^render-markdown][^obsidian][^telekasten][^ltex-ls][^vale]
 
 ### Gap B: Thin Neovim UX over Vale for fiction/prose style
 
@@ -153,7 +153,7 @@ For a prose/narrative Neovim setup, try this stack first:
 [^limelight]: `junegunn/limelight.vim` README: https://raw.githubusercontent.com/junegunn/limelight.vim/master/README.md
 [^zen]: `folke/zen-mode.nvim` README: https://raw.githubusercontent.com/folke/zen-mode.nvim/main/README.md
 [^twilight]: `folke/twilight.nvim` README: https://raw.githubusercontent.com/folke/twilight.nvim/main/README.md
-[^pencil-repo]: `preservim/vim-pencil` repository contents / README.markdown: https://api.github.com/repos/preservim/vim-pencil/contents and https://raw.githubusercontent.com/preservim/vim-pencil/master/README.markdown
+[^pencil-repo]: `reedes/vim-pencil` README (repo moved from `preservim/vim-pencil`): https://raw.githubusercontent.com/reedes/vim-pencil/master/README.markdown
 [^ltex-ls]: `valentjn/ltex-ls` README: https://raw.githubusercontent.com/valentjn/ltex-ls/develop/README.md
 [^grammarous]: `rhysd/vim-grammarous` README: https://raw.githubusercontent.com/rhysd/vim-grammarous/master/README.md
 [^writegood]: `davidbeckingsale/writegood.vim` README: https://raw.githubusercontent.com/davidbeckingsale/writegood.vim/master/README.md
