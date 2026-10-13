@@ -1,0 +1,21 @@
+[package]
+name = "myplugin_native"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+# cdylib = a C-ABI shared library that LuaJIT can dlopen.
+crate-type = ["cdylib"]
+
+[dependencies]
+# "module": link against the LuaJIT already running inside nvim (never "vendored").
+# "luajit": Neovim's LuaJIT is built without 5.2 compat, so not "luajit52".
+# Add "macros" for #[derive(UserData)] / #[derive(FromLua)].
+mlua = { version = "0.12", features = ["luajit", "module", "serde"] }
+serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+# Keep the default panic = "unwind": mlua turns callback panics into Lua errors.
+# panic = "abort" would make any panic kill Neovim.
