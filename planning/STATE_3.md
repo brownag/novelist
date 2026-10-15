@@ -18,7 +18,8 @@ Resume from this file and `planning/EXECUTION_PLAN_3.md`.
 |---|---|---|---|
 | 1 | 3.1.1 Vale process and diagnostic adapter | complete | Verified: 42 tests pass; report below |
 | 2 | 3.2.1 Explicit command and location-list integration | complete | Verified: 49 tests pass; report below |
-| 3 | 3.3.1 README/help documentation and manual smoke workflow | pending | Depends on 3.2.1 |
+| 3 | 3.3.1 README/help documentation and manual smoke workflow | complete | Verified; committed as 01c72fa; smoke exposed adapter stdin argv defect |
+| 4 | 3.4.1 Correct real-Vale stdin invocation | complete | Corrected stdin argv; adapter regression and configured real-Vale command smoke verified |
 
 Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs checks run serially at wave gates.
 
@@ -34,7 +35,7 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 - Classification: exit 0/1 = success (JSON parsed; empty `{}` = zero diagnostics); any other/nil code = process error preserving `code`/`stdout`/`stderr`; malformed JSON = parse error; launch throw caught via `pcall` (covers missing executable). Argv: `{ exe, '--output=JSON', '--ext=<ext>'?, '--path=<path>'?, '-' }`; stdin = buffer lines joined with `\n`.
 - Command: `./tests/run.sh` -> `Tests: 42 passed, 0 failed` (38 baseline + 4 new).
 - Deviations: none.
-- Gotchas for 3.2.1: adapter is intentionally UI-free (no loclist/notify/`vim.schedule`); integration owns captured window/buffer identity, scheduling editor work, loclist writes, and the `vale.executable` default. stdout JSON is path-keyed; record `path` is that key. Real stdin linting not locally verified (Vale 3.20.0 returned `{}` for piped stdin in an ad-hoc probe) — confirm at the 3.3.1 manual smoke gate.
+- Gotchas for 3.2.1: adapter is intentionally UI-free (no loclist/notify/`vim.schedule`); integration owns captured window/buffer identity, scheduling editor work, loclist writes, and the `vale.executable` default. stdout JSON is path-keyed; record `path` is that key. Initial real stdin smoke exposed an unsupported trailing `-`; corrected and verified by Task 3.4.1.
 
 ## 3.2.1
 
@@ -50,9 +51,20 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 
 ## 3.3.1
 
-- Status: complete — README/vimdoc Vale documentation and manual smoke workflow delivered (no commit). Manual real-Vale smoke was attempted but did not verify findings; recorded below, not claimed as a pass.
+- Status: complete — README/vimdoc Vale documentation delivered and committed as `01c72fa`. Manual real-Vale smoke was attempted but did not verify findings; recorded below, not claimed as a pass.
 - Files changed: `README.md` (overview + requirements; default config block and new `vale` options table; `:NovelistVale` command row; new "Vale (optional)" section; smoke steps 14-17); `doc/novelist.txt` (contents renumber + `|novelist-vale|`; overview + requirements; default config and `*novelist-vale-options*`; `*:NovelistVale*`; new VALE (OPTIONAL) section; smoke steps 14-17).
 - Commands: `make test` -> 49 passed, 0 failed; `make docs-check` -> passed (generated `doc/tags` removed with `make clean`); `git status` -> only `README.md`, `doc/novelist.txt`, new `planning/tasks/3.3.1.todo.md`.
 - Manual smoke (Neovim 0.12.5 headless, `/usr/bin/vale` 3.20.0, user-style `.vale.ini` in an OS temp project): performed, NOT passed. Vale flags a repeated word when reading a file and when reading piped stdin with `--path`/`--ext` and no positional argument (exit 1, finding), but returned `{}` (exit 0) for the argv form with a trailing `-` positional. Headless `:NovelistVale` on an unsaved named Markdown buffer ended with loclist count 0, message `novelist: no Vale findings`, and an empty quickfix.
-- Deviations: none in documentation scope.
-- Gotchas: real-Vale finding display is unverified against the current `lua/novelist/vale.lua` argv (the `-` positional vs Vale 3.20.0 stdin behavior). This is discovered, outside 3.3.1 file scope, and was not fixed. `make docs-check` leaves `doc/tags`; remove it with `make clean` unless tags are intentionally tracked.
+- Deviations: none in documentation scope; adapter defect was not changed out of scope.
+- Gotchas: real-Vale finding display is unverified against current adapter argv (`-` positional vs Vale 3.20.0 stdin behavior); follow-up is scoped to Task 3.4.1. `make docs-check` leaves `doc/tags`; remove it with `make clean` unless tags are intentionally tracked.
+
+## 3.4.1
+
+- Status: complete — removed unsupported stdin positional; adapter regression and configured real-command smoke passed.
+- Files changed: `lua/novelist/vale.lua` (3-12); `tests/unit/vale_test.lua` (36-64, 83-98); `planning/tasks/3.4.1.todo.md` (1-24, completed plan/evidence).
+- Test: `./tests/run.sh` -> `Tests: 49 passed, 0 failed`.
+- Manual smoke: Vale 3.20.0, Neovim 0.12.5; temporary `/tmp` `.vale.ini` + `Test.Repetition` style; launched headless Neovim with project as cwd and unsaved named Markdown buffer.
+- Finding run: one repeated-word diagnostic appeared in invoking window's `Novelist Vale` loclist; preloaded global quickfix title/item remained unchanged.
+- Clean run: loclist empty and `novelist: no Vale findings` observed; global quickfix remained unchanged.
+- An initial smoke attempt from repository cwd timed out because temporary Vale config was not discovered; rerun from configured project cwd passed. Temporary project removed.
+- Deviations: none; no UI integration or documentation changes. `./tests/run.sh` does not require Vale; only manual smoke used local Vale/config.

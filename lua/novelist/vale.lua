@@ -8,7 +8,6 @@ function M.build_argv(opts)
   if opts.path then
     table.insert(argv, '--path=' .. opts.path)
   end
-  table.insert(argv, '-')
   return argv
 end
 

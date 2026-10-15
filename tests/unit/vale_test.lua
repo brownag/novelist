@@ -48,7 +48,7 @@ h.test('adapter passes extension and path context and streams buffer lines to st
   end)
 
   h.assert_true(result.ok)
-  assert_list({ 'vale', '--output=JSON', '--ext=.md', '--path=/tmp/draft.md', '-' }, invocation.argv)
+  assert_list({ 'vale', '--output=JSON', '--ext=.md', '--path=/tmp/draft.md' }, invocation.argv)
   h.assert_equal('First line.\nSecond line.', invocation.stdin)
 
   local unnamed, unnamed_stub = process_result({ code = 0, stdout = '{}', stderr = '' })
@@ -60,7 +60,7 @@ h.test('adapter passes extension and path context and streams buffer lines to st
     }, function() end)
   end)
 
-  assert_list({ '/opt/vale', '--output=JSON', '--ext=.txt', '-' }, unnamed.argv)
+  assert_list({ '/opt/vale', '--output=JSON', '--ext=.txt' }, unnamed.argv)
 end)
 
 h.test('parses Vale JSON findings into stable diagnostic records', function()
@@ -80,12 +80,12 @@ h.test('parses Vale JSON findings into stable diagnostic records', function()
     },
   })
 
-  local _, stub = process_result({ code = 1, stdout = stdout, stderr = '' })
+  local invocation, stub = process_result({ code = 1, stdout = stdout, stderr = '' })
   local result
   with_process(stub, function()
     vale.check({
       executable = 'vale',
-      lines = { 'x' },
+      lines = { 'unsaved is is text' },
       path = '/tmp/draft.md',
       ext = '.md',
     }, function(value)
@@ -93,6 +93,8 @@ h.test('parses Vale JSON findings into stable diagnostic records', function()
     end)
   end)
 
+  assert_list({ 'vale', '--output=JSON', '--ext=.md', '--path=/tmp/draft.md' }, invocation.argv)
+  h.assert_equal('unsaved is is text', invocation.stdin)
   h.assert_true(result.ok)
   h.assert_equal(1, result.code)
   h.assert_equal(1, #result.diagnostics)

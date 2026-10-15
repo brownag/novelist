@@ -71,6 +71,7 @@ Add an explicitly invoked, optional Vale grammar/style check for Novelist's exis
 | 1 | `3.1.1` | Build/test the Vale stdin, async process, and JSON diagnostic adapter | — |
 | 2 | `3.2.1` | Add setup option and `:NovelistVale` location-list command | 3.1.1 |
 | 3 | `3.3.1` | Document Vale setup, command behavior, limits, and smoke workflow | 3.2.1 |
+| 4 | `3.4.1` | Correct stdin invocation for real Vale and verify findings end to end | 3.3.1 |
 
 All waves are sequential. Within-wave file scopes are disjoint (single task per wave). Maximum concurrency: 2.
 
@@ -112,6 +113,18 @@ All waves are sequential. Within-wave file scopes are disjoint (single task per 
 - **Acceptance:** README and help agree on config key/default, command, supported filetypes, async/unsaved behavior, location-list vs quickfix, and optional dependency boundary; `make test` and `make docs-check` pass. Record whether manual Neovim 0.12+ Vale smoke was actually possible/performed; never claim success without evidence.
 - **Targeted test:** `make test` and `make docs-check`; manual Neovim 0.12+ smoke test when configured Vale is available.
 
+### Task 3.4.1 — Correct real-Vale stdin invocation
+
+- **Repo:** `/home/andrew/workspace/novelist`
+- **Files in scope — must edit:** `lua/novelist/vale.lua`, `tests/unit/vale_test.lua`.
+- **Can create:** temporary Vale config/styles, sample drafts, and fake executables under the OS temp directory only; do not leave repository artifacts.
+- **Depends on:** `3.3.1` (the end-to-end manual check exposed this issue after the public behavior was documented).
+- **Spec:** Fix the adapter's stdin argv so Vale 3.20.0 (and the documented supported CLI behavior) actually lints the supplied unsaved buffer text. The existing adapter appends a `-` positional, which the observed Vale 3.20.0 invocation treats as a filename and returns empty JSON even when stdin contains a known finding; the same stdin and `--path` without `-` produced the finding. Preserve explicit asynchronous execution, `--output=JSON`, path/extension association, user-owned config discovery, result classification and error behavior. Add regression coverage asserting the exact argv omits the unsupported positional and that controlled real/fake process behavior retains diagnostics. Do not alter command/UI integration or documentation unless a narrowly necessary clarification is approved by the orchestrator.
+- **Constraints / do not touch:** do not edit `commands.lua`, `init.lua`, integration tests, README/help, or add dependencies; do not create repo config/styles; no synchronous execution or shell interpolation.
+- **Grep anchors:** argv construction and JSON parsing in `lua/novelist/vale.lua`; adapter tests in `tests/unit/vale_test.lua`; manual smoke evidence in `planning/STATE_3.md` under `## 3.3.1` and discovered issue in `planning/tasks/3.3.1.todo.md`.
+- **Acceptance:** `./tests/run.sh` passes with a regression test for the correct stdin argv; perform the documented Neovim 0.12+ `:NovelistVale` smoke against a temporary configured Vale project and confirm a known finding reaches the invoking window's location list while global quickfix remains unchanged. Also confirm no-findings behavior. Record exact evidence; do not claim success if configuration/runtime prevents the check.
+- **Targeted test:** `./tests/run.sh`; manual Neovim 0.12+ Vale smoke.
+
 ## Hazards and handoff notes
 
 - Vale needs a user-owned `.vale.ini` and styles; local availability of `/usr/bin/vale` does not make it a project dependency. Avoid tests relying on local config or network.
@@ -124,7 +137,8 @@ All waves are sequential. Within-wave file scopes are disjoint (single task per 
 ## Plan review
 
 - **Spec axis:** all roadmap scope and user decisions map to tasks or explicit deferrals; no narrative interpretation, other checkers, installation, auto-linting, or new formats are added. ADRs remain unsuperseded.
-- **Standards axis:** tasks are dependency ordered, bounded to separate adapter/integration/docs phases, with explicit files, anchors, acceptance and commands. Each task fits a <=12-step micro-plan; temporary test executables are restricted to OS temp. The adapter isolates parsing/process concerns; integration owns Neovim UI and async lifecycle; docs close the public contract.
+- **Standards axis:** tasks are dependency ordered, bounded to separate adapter/integration/docs/repair phases, with explicit files, anchors, acceptance and commands. Each task fits a <=12-step micro-plan; temporary test executables/config are restricted to OS temp. The adapter isolates parsing/process concerns; integration owns Neovim UI and async lifecycle; docs close the public contract. A manual smoke failure discovered an adapter regression, so Task 3.4.1 was added rather than widening the docs task's files.
 - Vale JSON's concrete shape and findings exit status must be confirmed during Task 3.1.1; unnamed buffers should use filetype-derived extension, while named buffers pass their path. User-owned Vale configuration discovery should follow Vale defaults rather than inventing a Novelist config option.
 - Review finding resolved: async location-list ownership now explicitly captures the invoking window and avoids mutating another window's list if it is no longer valid for the source buffer.
-- No implementation has started as part of this planning task.
+- Execution finding: the real-Vale smoke exposed that the trailing `-` argument suppresses stdin findings in Vale 3.20.0; Task 3.4.1 is a bounded adapter repair and end-to-end verification, not scope expansion.
+- Execution complete: Task 3.4.1 removed the trailing `-`; 49 automated tests pass, and the configured Vale 3.20.0 / Neovim 0.12.5 smoke verified finding and no-finding behavior while preserving global quickfix. Details are in `planning/STATE_3.md`.
