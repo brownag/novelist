@@ -47,3 +47,13 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 - Tests: `./tests/run.sh` -> `Tests: 34 passed, 0 failed` (22 baseline + 8 document_map + 4 integration); parser-present rich test guarded by a parser probe.
 - Deviation: verification retry changed `buffer = bufnr` to `buf = bufnr` in the `<CR>` map (0.12 spelling; both accepted on 0.12.5).
 - Gotchas for 2.3.1: no default global maps; the only new keymap is buffer-local to the plugin-owned outline buffer.
+
+## 2.3.1
+- Status: complete (awaiting orchestrator verification).
+- Files: `lua/novelist/keymaps.lua` (new); `lua/novelist/init.lua` (+2 lines); `tests/unit/keymaps_test.lua` (new, 4 tests).
+- Module: `M.actions` (5 defaults) + `M.setup(config)`; `resolve_desired` returns `{}` unless `config.preset == 'suggested'`; per-action `lhs`/`mode`/`desc` overrides, `false` drops, unknown action IDs ignored, RHS is `<cmd>Command<cr>`.
+- Ownership: module-local `state.installed` keyed by action with record `{configured, mode, expanded, rhs, desc}`; `remove_owned` deletes via `vim.keymap.del` only when the current `maparg` dict still matches stored `rhs`+`desc`; conflicts are WARN-notified and skipped; repeated setup does not duplicate maps.
+- init.lua: `default_config()` gains `keymaps = { preset = false, mappings = {} }`; `M.setup` calls `require('novelist.keymaps').setup(M.config.keymaps)` after command registration.
+- Tests: `./tests/run.sh` -> `Tests: 38 passed, 0 failed` (34 baseline + 4 keymap tests: opt-in lifecycle; overrides/false; conflict safety; repeated setup + disable ownership).
+- Deviation: test RHS assertions use the string `maparg` form (normalized `<Cmd>..<CR>`) because the dict form returns the raw `<cmd>..<cr>`; ownership comparison uses the dict form consistently on both store and compare.
+- Gotchas for 2.4.1: document `keymaps = { preset = 'suggested', mappings = { <action> = false | { lhs, mode, desc } } }`, the five action IDs/keys, WARN-on-conflict, and that plain `setup()` installs no maps.

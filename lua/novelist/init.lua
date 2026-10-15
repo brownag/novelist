@@ -43,6 +43,7 @@ local function default_config()
   return {
     prose = copy_value(settings.defaults),
     markers = {},
+    keymaps = { preset = false, mappings = {} },
   }
 end
 
@@ -86,6 +87,7 @@ function M.setup(opts)
   M.config = merge_into(M.config or default_config(), opts or {})
   register_autocmds()
   require('novelist.commands').register(M.get_config)
+  require('novelist.keymaps').setup(M.config.keymaps)
   return M.config
 end
 
