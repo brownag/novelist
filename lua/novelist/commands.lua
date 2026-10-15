@@ -1,5 +1,6 @@
 local cockpit = require('novelist.cockpit')
 local document_map = require('novelist.document_map')
+local vale = require('novelist.vale')
 
 local M = {}
 
@@ -251,6 +252,105 @@ local function complete_markers(arg_lead)
   return names
 end
 
+local vale_filetypes = { markdown = true, text = true }
+
+local vale_severity_types = {
+  error = 'E',
+  warning = 'W',
+  suggestion = 'I',
+}
+
+local function vale_extension(filetype)
+  if filetype == 'markdown' then
+    return '.md'
+  end
+  return '.txt'
+end
+
+local function vale_loclist_items(filename, bufnr, diagnostics)
+  local items = {}
+  for _, diagnostic in ipairs(diagnostics) do
+    local item = {
+      bufnr = bufnr,
+      lnum = diagnostic.line or 1,
+      col = diagnostic.col or 1,
+      end_col = diagnostic.end_col,
+      type = vale_severity_types[diagnostic.severity] or 'I',
+      text = diagnostic.message or diagnostic.check or '',
+    }
+    if filename and filename ~= '' then
+      item.filename = filename
+    end
+    table.insert(items, item)
+  end
+  return items
+end
+
+local function apply_vale_result(winid, bufnr, filename, result)
+  if not result.ok then
+    notify('novelist: Vale check failed: ' .. tostring(result.error), vim.log.levels.ERROR)
+    return
+  end
+
+  local displays_source = vim.api.nvim_win_is_valid(winid)
+    and vim.api.nvim_win_get_buf(winid) == bufnr
+    and vim.api.nvim_buf_is_valid(bufnr)
+  if not displays_source then
+    notify('novelist: Vale results could not be displayed in the invoking window', vim.log.levels.WARN)
+    return
+  end
+
+  local items = vale_loclist_items(filename, bufnr, result.diagnostics)
+  vim.fn.setloclist(winid, {}, ' ', {
+    title = 'Novelist Vale',
+    items = items,
+  })
+
+  if #items == 0 then
+    notify('novelist: no Vale findings', vim.log.levels.INFO)
+    return
+  end
+
+  vim.api.nvim_win_call(winid, function()
+    vim.cmd('lopen')
+  end)
+end
+
+local function vale_command()
+  local bufnr = current_buffer()
+  if not bufnr then
+    return
+  end
+
+  local filetype = vim.bo[bufnr].filetype
+  if not vale_filetypes[filetype] then
+    notify('novelist: :NovelistVale supports markdown and text buffers', vim.log.levels.WARN)
+    return
+  end
+
+  local winid = vim.api.nvim_get_current_win()
+  local lines = current_lines(bufnr)
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  local config = get_config() or {}
+  local executable = (config.vale or {}).executable or 'vale'
+
+  local opts = {
+    executable = executable,
+    lines = lines,
+  }
+  if name ~= '' then
+    opts.path = name
+  else
+    opts.ext = vale_extension(filetype)
+  end
+
+  vale.check(opts, function(result)
+    vim.schedule(function()
+      apply_vale_result(winid, bufnr, name, result)
+    end)
+  end)
+end
+
 function M.register(config_getter)
   get_config = config_getter or get_config
 
@@ -276,6 +376,11 @@ function M.register(config_getter)
 
   vim.api.nvim_create_user_command('NovelistDocumentMap', document_map_command, {
     desc = 'Open the novelist document map outline',
+    force = true,
+  })
+
+  vim.api.nvim_create_user_command('NovelistVale', vale_command, {
+    desc = 'Check the current buffer with Vale',
     force = true,
   })
 end

@@ -43,6 +43,7 @@ local function default_config()
   return {
     prose = copy_value(settings.defaults),
     markers = {},
+    vale = { executable = 'vale' },
     keymaps = { preset = false, mappings = {} },
   }
 end
