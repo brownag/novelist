@@ -47,3 +47,12 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 - Command: `./tests/run.sh` -> `Tests: 49 passed, 0 failed` (42 baseline + 7 new).
 - Deviations: none.
 - Gotchas for 3.3.1: closing a loclist window with `lclose` does not clear the window's loclist contents (tests clear lists per case); document loclist-vs-quickfix isolation, unsupported-filetype behavior, and that real-Vale stdin smoke remains pending.
+
+## 3.3.1
+
+- Status: complete — README/vimdoc Vale documentation and manual smoke workflow delivered (no commit). Manual real-Vale smoke was attempted but did not verify findings; recorded below, not claimed as a pass.
+- Files changed: `README.md` (overview + requirements; default config block and new `vale` options table; `:NovelistVale` command row; new "Vale (optional)" section; smoke steps 14-17); `doc/novelist.txt` (contents renumber + `|novelist-vale|`; overview + requirements; default config and `*novelist-vale-options*`; `*:NovelistVale*`; new VALE (OPTIONAL) section; smoke steps 14-17).
+- Commands: `make test` -> 49 passed, 0 failed; `make docs-check` -> passed (generated `doc/tags` removed with `make clean`); `git status` -> only `README.md`, `doc/novelist.txt`, new `planning/tasks/3.3.1.todo.md`.
+- Manual smoke (Neovim 0.12.5 headless, `/usr/bin/vale` 3.20.0, user-style `.vale.ini` in an OS temp project): performed, NOT passed. Vale flags a repeated word when reading a file and when reading piped stdin with `--path`/`--ext` and no positional argument (exit 1, finding), but returned `{}` (exit 0) for the argv form with a trailing `-` positional. Headless `:NovelistVale` on an unsaved named Markdown buffer ended with loclist count 0, message `novelist: no Vale findings`, and an empty quickfix.
+- Deviations: none in documentation scope.
+- Gotchas: real-Vale finding display is unverified against the current `lua/novelist/vale.lua` argv (the `-` positional vs Vale 3.20.0 stdin behavior). This is discovered, outside 3.3.1 file scope, and was not fixed. `make docs-check` leaves `doc/tags`; remove it with `make clean` unless tags are intentionally tracked.

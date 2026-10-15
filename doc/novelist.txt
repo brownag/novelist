@@ -10,10 +10,11 @@ CONTENTS                                                    *novelist-contents*
 3. Setup and configuration                       |novelist-setup|
 4. Commands                                      |novelist-commands|
 5. Document map                                  |novelist-document-map|
-6. Keymaps                                       |novelist-keymaps|
-7. Markers                                       |novelist-markers|
-8. Word-count limitations                        |novelist-word-count|
-9. Manual smoke test                             |novelist-smoke-test|
+6. Vale                                          |novelist-vale|
+7. Keymaps                                       |novelist-keymaps|
+8. Markers                                       |novelist-markers|
+9. Word-count limitations                        |novelist-word-count|
+10. Manual smoke test                            |novelist-smoke-test|
 
 ==============================================================================
 OVERVIEW                                                    *novelist-overview*
@@ -25,12 +26,14 @@ Markdown and plain-text drafts.
 It provides automatic local prose options for supported buffers,
 heading-based section navigation, current-section and document word counts,
 configurable standalone story/revision markers such as `@who:` and `@todo:`, a
-document map outline of headings and Markdown structure, and an opt-in suggested
-keymap preset.
+document map outline of headings and Markdown structure, an opt-in suggested
+keymap preset, and an optional explicit `:NovelistVale` check that runs a
+user-installed Vale.
 
-`novelist` does not infer story meaning automatically, and it does not provide
-grammar or style checking. It installs named commands only; it does not create
-default keymaps unless you opt in to the suggested preset.
+`novelist` does not infer story meaning automatically. It does not bundle
+grammar or style checking, but you can run an external, user-installed Vale
+over the current buffer with `:NovelistVale`. It installs named commands only;
+it does not create default keymaps unless you opt in to the suggested preset.
 
 ==============================================================================
 REQUIREMENTS AND INSTALLATION                                *novelist-install*
@@ -39,6 +42,8 @@ Requirements:
 
 - Neovim 0.12+ is the release target.
 - No required third-party Neovim plugins or external tools.
+- Optional: Vale (https://vale.sh) for |:NovelistVale|. You install and
+  configure Vale yourself; `novelist` neither installs it nor requires it.
 
 Install the repository with your preferred Neovim plugin manager, using the
 manager's normal syntax for a plugin repository. In generic terms: >lua
@@ -72,6 +77,7 @@ Default configuration: >lua
       textwidth = 0,
     },
     markers = {},
+    vale = { executable = 'vale' },
     keymaps = { preset = false, mappings = {} },
   })
 <
@@ -137,6 +143,21 @@ remain arbitrary text. >lua
   })
 <
 
+`vale` options:
+
+                                                        *novelist-vale-options*
+`vale.executable`                                    Default: `'vale'`
+        Vale executable name or path used by |:NovelistVale|. There is no
+        `vale.enabled` option: checking only happens when you invoke
+        |:NovelistVale|.
+
+Set the executable: >lua
+
+  require('novelist').setup({
+    vale = { executable = '/usr/local/bin/vale' },
+  })
+<
+
 ==============================================================================
 COMMANDS                                                  *novelist-commands*
 
@@ -164,6 +185,11 @@ COMMANDS                                                  *novelist-commands*
 :NovelistDocumentMap
         Open a navigable outline of the current buffer in a vertical split
         while keeping the source visible.
+
+                                                        *:NovelistVale*
+:NovelistVale
+        Check the current Markdown or plain-text buffer with a user-installed
+        Vale and show findings in the invoking window's location list.
 
 Sections are based on Markdown ATX headings (`#` through `######` followed by
 whitespace). A headingless document is treated as one implicit whole-document
@@ -197,6 +223,39 @@ Tree-sitter API or a Markdown parser is unavailable, or parsing fails, the
 outline falls back to headings plus markers and shows a notice that richer
 Markdown structure is unavailable. Installing a Markdown parser is optional and
 owned by you.
+
+==============================================================================
+VALE (OPTIONAL)                                                *novelist-vale*
+
+:NovelistVale runs Vale (https://vale.sh), an external grammar and style
+checker, over the current buffer. Vale is optional and user-owned: you install
+it and provide your own Vale configuration and styles. `novelist` does not
+install Vale, write `.vale.ini` or styles, or require Vale for any other
+feature.
+
+The command checks the current buffer's contents, including unsaved edits, and
+runs asynchronously so Neovim stays responsive. It supports `markdown` and
+`text` buffers; other filetypes are rejected with a warning. Named buffers are
+checked with their file path; unnamed buffers are checked as Markdown or plain
+text according to their filetype.
+
+Findings are placed in the invoking window's location list, which opens only
+when there is at least one finding. The global quickfix list is never modified.
+When there are no findings, `novelist` reports that instead of opening an empty
+list.
+
+If Vale cannot be launched, exits with an unexpected error, or returns output
+that cannot be parsed, `novelist` reports the error and leaves the window's
+existing location list untouched. If the invoking window has closed or no
+longer shows the checked buffer by the time the asynchronous check finishes,
+the results are not shown anywhere and `novelist` reports that they could not
+be displayed.
+
+Checking is always explicit: `novelist` does not lint while you type, add
+autocmds, or create a keymap for the command.
+
+Set the executable used by |:NovelistVale| with `vale.executable` (default
+`'vale'`). See |novelist-vale-options|.
 
 ==============================================================================
 KEYMAPS                                                    *novelist-keymaps*
@@ -330,6 +389,17 @@ run on that runtime.
 13. Optionally configure `keymaps = { preset = 'suggested' }` and confirm the
     five `<leader>n?` mappings, then check one `lhs`/`mode`/`desc` override and
     one `false` disable; confirm plain `setup()` leaves those keys unmapped.
+14. Install Vale and create your own Vale project (a `.vale.ini` and styles) in
+    a scratch directory. Vale configuration is yours; `novelist` neither
+    creates nor changes it.
+15. Open a Markdown draft from that project, add a sentence Vale will flag, and
+    run `:NovelistVale`. Confirm the invoking window's location list opens with
+    the finding, and confirm the global quickfix list (`:copen`) is unchanged.
+16. Edit the buffer without saving and run `:NovelistVale` again; confirm the
+    findings reflect the unsaved text.
+17. Run `:NovelistVale` in a buffer with no findings and confirm `novelist`
+    reports that there are no findings instead of opening an empty location
+    list.
 
 Automated checks:
 
