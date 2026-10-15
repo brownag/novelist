@@ -1,46 +1,28 @@
 # TODO
 
 ## Goal
-Resolve the review’s duplicated test-helper and speculative marker-description findings, then validate the plugin with the dependency-free suite and a Neovim 0.12.6 smoke test.
+Gather primary-source evidence and open design decisions for the **Integrations and Interaction** roadmap phase, so a later `/plan-wave` session can define a bounded implementation plan without changing plugin code.
 
 ## Tasks
 
-### 1. Share test buffer helpers
-- [x] Move the helpers duplicated by `tests/unit/settings_test.lua` and `tests/unit/integration_test.lua` into `tests/helpers.lua`, preserving their current test behavior and cleanup guarantees.
-- [x] Update both test files to use the shared helpers and remove duplicate definitions.
-- [x] Run `./tests/run.sh` and confirm all tests pass (22 passed, 0 failed).
+### 1. Establish the current integration baseline
+- [x] Inspect the current public setup/configuration API, command registration, filetype behavior, package/runtime layout, tests, README, and Neovim help for integration and interaction extension points.
+- [x] Record applicable constraints from accepted ADRs 0001 and 0002, including dependency-free operation and no default keymaps.
 
-### 2. Remove speculative marker-description support
-- [x] Simplify `lua/novelist/cockpit.lua` marker resolution and extraction to support the documented string descriptions only; remove table-description copying/unwrapping.
-- [x] Confirm tests cover default descriptions, string overrides, custom string markers, and disabled markers; add or adjust focused tests if needed.
-- [x] Run `./tests/run.sh` and confirm all tests pass (22 passed, 0 failed).
+### 2. Research candidate integration approaches
+- [ ] Use primary sources (official Neovim documentation and first-party plugin-manager/parser documentation or source) to investigate plugin-manager-specific integration, optional parser/runtime integrations, and user-configurable keymaps.
+- [ ] Compare only options relevant to this plugin; distinguish documented facts from assumptions, trade-offs, and unresolved choices.
+- [ ] Verify that every cited technical claim links to the source that owns it; do not treat secondary articles as authoritative evidence.
 
-### 3. Validate on Neovim 0.12.6
-- [x] Run the documented smoke-test workflow with `/opt/nvim-linux-x86_64/bin/nvim` (0.12.6): load the plugin, verify Markdown prose settings, navigate headings, check word counts, and inspect filtered marker quickfix results.
-- [x] Record the exact runtime version, checks performed, and outcome here; do not claim checks that were not performed.
+### 3. Produce a scoping brief for the next `/plan-wave`
+- [ ] Save one Markdown brief under `planning/research/` describing the baseline, candidate approaches, ADR constraints, risks/dependencies, and decisions the user must make during `/plan-wave`.
+- [ ] Keep plugin code, tests, README/help, ADRs, and orchestration plans unchanged; this task gathers evidence only.
+- [ ] Check that the brief's recommendations preserve optional integrations and user-configured mappings unless the user explicitly chooses otherwise.
+- [ ] Run `git diff --check` and verify only `TODO.md` and the new scoping brief changed.
 
 ## Notes
-- Keep changes limited to `tests/helpers.lua`, the two unit test files, `lua/novelist/cockpit.lua`, and this `TODO.md`, unless a required scoped change is discovered and approved first.
-- Do not modify or remove unrelated untracked `reports/`, `research_notes/`, or `.claude/` content.
-- Do not commit unless separately requested.
-- Validation: `/opt/nvim-linux-x86_64/bin/nvim --version` reports `NVIM v0.12.6`. A direct headless smoke workflow loaded `plugin/novelist.lua`, applied Markdown defaults (`spell`, `spelllang`, `wrap`, `linebreak`, `breakindent`, `textwidth`), navigated to next/previous headings, ran `:NovelistWordCount` (reported section 4 / document 8 for the sample), and verified `:NovelistMarkers todo` produced the expected quickfix line/text. Output: `Neovim 0.12.6 smoke checks passed`.
-- The first smoke invocation used buffer-scoped option access for window-local `spell` and timed out after the assertion error; the successful rerun used Neovim's buffer/window option fallback, matching the plugin's option handling.
-
-## Follow-up: Git ignore and tracked research files
-
-### 1. Preserve already-separated tracked-file commits
-- [x] Confirm `159ffd0` and `577793e` remain in history as separate commits; do not amend or recreate them.
-
-### 2. Ignore only local Claude workspace data
-- [x] Add `.claude/.gitignore` containing `*` so the ignore rule stays inside `.claude/`.
-- [x] Verify `.claude/` contents are ignored and `reports/` and `research_notes/` remain visible to Git.
-- [x] Force-add and conventionally commit `.claude/.gitignore` (its own `*` pattern may ignore the file itself): `d03e4c9`.
-
-### 3. Track research artifacts
-- [x] Add and commit `reports/` and `research_notes/` as tracked project documentation using conventional commit messages (`2fb0471`, `318c521`).
-- [x] Verify the intended files are committed and no unrelated tracked changes are staged.
-
-## Follow-up notes
-- The two previously modified tracked files are already committed separately: `159ffd0` and `577793e`.
-- Track all files currently under `reports/` (2 Markdown files) and `research_notes/` (6 Markdown files); track only `.claude/.gitignore` under `.claude/`.
-- Leave unrelated modifications untouched and do not amend prior commits.
+- Scope is the first roadmap phase only: **Integrations and Interaction**. Do not research or plan implementation for Writing Assistance, Manuscript Workflow, Story Organization, or Format Support.
+- The agreed candidate areas are plugin-manager-specific integration where valuable, optional parser/runtime integrations, and user-configurable keymaps.
+- Preserve the accepted constraints: no required third-party dependency (ADR 0001) and no default keymaps (ADR 0002). Do not propose superseding either ADR; surface any apparent conflict as an explicit user decision.
+- Do not implement features or create `EXECUTION_PLAN_2.md`, `PROMPT_TEMPLATE_2.md`, or `STATE_2.md` in this scoping task.
+- The current suite baseline is `make test`: 22 passed, 0 failed. This is research/scoping work, so no implementation tests are expected.

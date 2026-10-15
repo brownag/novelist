@@ -41,21 +41,25 @@ Before preparing another wave plan, inspect `git status`, current tests, README/
 
 `planning/research/` contains exploratory reports on Rust Neovim plugin approaches (`mlua` and `nvim-oxi`). These do not change the accepted Lua architecture or create implementation commitments; the execution plan explicitly chose standalone Lua and deferred required dependencies.
 
-## Deferred directions (not approved implementation scope)
+## Future roadmap phases
 
-The original plan explicitly deferred these capabilities. Treat each as a candidate for discussion, not an implicit commitment or backlog item:
+The user-selected planning order is **5 → 1 → 2 → 3 → 4**. Each phase is a roadmap boundary for a future `/plan-wave` session, not a pre-approved implementation plan. The phase number retains the earlier group number; execution plan numbering remains sequential (the next orchestration set is 2). Features listed below remain candidates until scoped and approved in their own `/plan-wave` session.
 
-- Grammar/style checking (Vale, LTeX/LanguageTool).
-- Manuscript compilation, export, or submission formatting.
-- Org/Neorg and other non-Markdown/plain-text filetypes.
-- Story-bible/vault features, backlinks, timeline consistency analysis, or automatic narrative interpretation.
-- Required Tree-sitter, plugin-manager-specific integration, default keymaps, focus mode, or Markdown rendering.
+| Order | Phase | Candidate scope | Boundaries and dependencies |
+|---|---|---|---|
+| 1 | **Integrations and Interaction** (group 5) | Plugin-manager-specific integration where it provides clear value; optional parser/runtime integrations; user-configurable keymaps. | Preserve ADR 0001: no required third-party dependencies. Preserve ADR 0002: no default keymaps. Optional integrations must not make the standalone plugin unusable. This is the first phase by user direction. |
+| 2 | **Writing Assistance** (group 1) | Grammar/style integrations such as Vale or LTeX/LanguageTool; automatic narrative interpretation as a separate or explicitly optional direction. | Prioritize grammar/style integration. Keep interpretation separate/optional because the current contract treats marker values and story facts as writer-authored text. Reconcile any interpretation proposal with accepted ADRs before planning it. |
+| 3 | **Manuscript Workflow** (group 2) | Manuscript compilation/export/submission formatting; focus mode and Markdown rendering. | Treat compilation/export separately from focus/rendering so a future plan can scope and sequence them independently. Companion integrations should remain optional unless a decision explicitly supersedes current architecture. |
+| 4 | **Story Organization** (group 3) | Story-bible/vault features; backlinks and connected reference material; timeline consistency analysis. | Keep these as distinct candidate workstreams; they may need different data models or integrations. Resolve storage and scope before drafting implementation tasks. |
+| 5 | **Format Support** (group 4) | Additional format adapters, including Org, Neorg, or other formats beyond Markdown/plain text. | Treat each format as a separate candidate adapter. Markdown/plain text remain the baseline; decide which additional formats merit support in this phase's `/plan-wave` session. |
 
-A future `/plan-wave` session must establish a concrete goal and resolve scope/order decisions with the user before drafting execution artifacts. If a proposal conflicts with an accepted ADR, resolve that explicitly and update/supersede the ADR as part of the approved plan.
+### Future phase planning workflow
 
-## How to continue
+For each phase, in the order above:
 
-1. Review this roadmap, `TODO.md`, current code/tests/docs, `docs/decisions/README.md`, and relevant accepted ADRs.
-2. Identify one bounded, user-approved next goal; distinguish facts from choices that need user decisions.
-3. Run `/plan-wave` to produce the next numbered execution-plan artifact set, with dependencies and acceptance criteria based on the current repository.
-4. After implementation, update task/state evidence and revise this master plan only when durable scope/order changes—not for transient task status.
+1. Re-read this roadmap, `TODO.md`, current code/tests/docs, `docs/decisions/README.md`, and the accepted ADRs. Check which candidate work is still relevant and avoid assuming prior status is current.
+2. Use `/plan-wave` to establish a bounded goal, resolve the phase's choices with the user, and create the next numbered `EXECUTION_PLAN_N.md`, `PROMPT_TEMPLATE_N.md`, and `STATE_N.md` set with dependencies and acceptance criteria.
+3. Do not silently pull candidate work from later phases into an earlier plan. If a dependency requires changing phase order, ask the user and record the decision.
+4. After implementation, update task/state evidence. Revise this master plan only for durable scope/order changes, not transient task status.
+
+If any proposed implementation conflicts with an accepted ADR, explicitly resolve whether the plan complies or supersedes that ADR, and record the target ADR ID and required update in the approved plan.
