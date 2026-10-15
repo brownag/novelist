@@ -10,15 +10,15 @@ Gather primary-source evidence and open design decisions for the **Integrations 
 - [x] Record applicable constraints from accepted ADRs 0001 and 0002, including dependency-free operation and no default keymaps.
 
 ### 2. Research candidate integration approaches
-- [ ] Use primary sources (official Neovim documentation and first-party plugin-manager/parser documentation or source) to investigate plugin-manager-specific integration, optional parser/runtime integrations, and user-configurable keymaps.
-- [ ] Compare only options relevant to this plugin; distinguish documented facts from assumptions, trade-offs, and unresolved choices.
-- [ ] Verify that every cited technical claim links to the source that owns it; do not treat secondary articles as authoritative evidence.
+- [x] Use primary sources (official Neovim documentation and first-party plugin-manager/parser documentation or source) to investigate plugin-manager-specific integration, optional parser/runtime integrations, and user-configurable keymaps.
+- [x] Compare only options relevant to this plugin; distinguish documented facts from assumptions, trade-offs, and unresolved choices.
+- [x] Verify that every cited technical claim links to the source that owns it; do not treat secondary articles as authoritative evidence.
 
 ### 3. Produce a scoping brief for the next `/plan-wave`
-- [ ] Save one Markdown brief under `planning/research/` describing the baseline, candidate approaches, ADR constraints, risks/dependencies, and decisions the user must make during `/plan-wave`.
-- [ ] Keep plugin code, tests, README/help, ADRs, and orchestration plans unchanged; this task gathers evidence only.
-- [ ] Check that the brief's recommendations preserve optional integrations and user-configured mappings unless the user explicitly chooses otherwise.
-- [ ] Run `git diff --check` and verify only `TODO.md` and the new scoping brief changed.
+- [x] Save one Markdown brief under `planning/research/` describing the baseline, candidate approaches, ADR constraints, risks/dependencies, and decisions the user must make during `/plan-wave`.
+- [x] Keep plugin code, tests, README/help, ADRs, and orchestration plans unchanged; this task gathers evidence only.
+- [x] Check that the brief's recommendations preserve optional integrations and user-configured mappings unless the user explicitly chooses otherwise.
+- [x] Run `git diff --check` and verify only `TODO.md` and the new scoping brief changed.
 
 ## Notes
 - Scope is the first roadmap phase only: **Integrations and Interaction**. Do not research or plan implementation for Writing Assistance, Manuscript Workflow, Story Organization, or Format Support.
