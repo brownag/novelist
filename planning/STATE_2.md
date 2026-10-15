@@ -18,8 +18,8 @@ Resume from this file and `planning/EXECUTION_PLAN_2.md`.
 |---|---|---|---|
 | 1 | 2.1.1 Document structure model with optional Tree-sitter | complete | report below |
 | 2 | 2.2.1 Scratch outline UI and document-map command | complete | report below |
-| 3 | 2.3.1 Opt-in suggested mapping preset | pending | Depends on 2.2.1 |
-| 4 | 2.4.1 Documentation and manual outline validation | pending | Depends on 2.3.1 |
+| 3 | 2.3.1 Opt-in suggested mapping preset | complete | report below; verified and committed as df3794a |
+| 4 | 2.4.1 Documentation and manual outline validation | complete | report below |
 
 Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs checks run serially at wave gates.
 
@@ -57,3 +57,14 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 - Tests: `./tests/run.sh` -> `Tests: 38 passed, 0 failed` (34 baseline + 4 keymap tests: opt-in lifecycle; overrides/false; conflict safety; repeated setup + disable ownership).
 - Deviation: test RHS assertions use the string `maparg` form (normalized `<Cmd>..<CR>`) because the dict form returns the raw `<cmd>..<cr>`; ownership comparison uses the dict form consistently on both store and compare.
 - Gotchas for 2.4.1: document `keymaps = { preset = 'suggested', mappings = { <action> = false | { lhs, mode, desc } } }`, the five action IDs/keys, WARN-on-conflict, and that plain `setup()` installs no maps.
+
+## 2.4.1
+- Status: complete (awaiting orchestrator verification).
+- Files: `README.md`; `doc/novelist.txt` (docs only; no Lua/test changes).
+- README: added document-map + opt-in-preset bullets, `keymaps` default in the config block, `:NovelistDocumentMap` row, new `## Document map` and `## Keymaps (opt-in)` sections, and smoke steps 10-13.
+- Help: renumbered contents to 9 sections, added `|novelist-document-map|`/`|novelist-keymaps|` (+ `*:NovelistDocumentMap*`), keymaps default, mirrored command/fallback/opt-in/mapping text, smoke steps 10-13.
+- Behavior documented: vertical-split scratch outline (re-run refresh, no live tracking), Enter jumps to source, richer Markdown rows only with Tree-sitter, headings-only fallback notice, markers always line-parsed, no parser install/config; five action IDs/keys, `lhs`/`mode`/`desc`, `false` disable, conflict skip+warn, no maps by default.
+- Commands: `make test` -> `Tests: 38 passed, 0 failed`; `make docs-check` -> exit 0 (`:help novelist` resolved); `make clean` removed generated `doc/tags`.
+- Alignment cross-check: shared public names/keys/behaviors present in both README and help (grep match).
+- Deviations from the approved plan: none.
+- Manual Neovim 0.12+ smoke test: documented only; NOT performed/claimed.

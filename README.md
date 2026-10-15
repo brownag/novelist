@@ -7,7 +7,9 @@ It provides:
 - automatic local prose options for supported buffers;
 - heading-based section navigation;
 - current-section and document word counts;
-- configurable standalone story/revision markers such as `@who:` and `@todo:`.
+- configurable standalone story/revision markers such as `@who:` and `@todo:`;
+- a document map outline of headings and Markdown structure;
+- an opt-in suggested keymap preset.
 
 `novelist` does not infer story meaning automatically, and it does not provide grammar or style checking.
 
@@ -47,6 +49,7 @@ require('novelist').setup({
     textwidth = 0,
   },
   markers = {},
+  keymaps = { preset = false, mappings = {} },
 })
 ```
 
@@ -91,7 +94,7 @@ require('novelist').setup({
 
 ## Commands
 
-`novelist` installs named commands only; it does not create default keymaps.
+`novelist` installs named commands only; it does not create default keymaps unless you opt in to the suggested preset described in [Keymaps](#keymaps-opt-in).
 
 | Command | Description |
 | --- | --- |
@@ -99,8 +102,60 @@ require('novelist').setup({
 | `:NovelistScenePrev` | Move to the previous Markdown ATX section heading. Warns if there is no previous heading. |
 | `:NovelistWordCount` | Report current section words and document words with `vim.notify`. |
 | `:NovelistMarkers [name]` | Put matching marker lines in the quickfix list. Optional `[name]` filters by marker name, such as `todo`. Opens the quickfix window only when matches exist. |
+| `:NovelistDocumentMap` | Open the document map outline in a vertical split. |
 
 Sections are based on Markdown ATX headings (`#` through `######` followed by whitespace). A headingless document is treated as one implicit whole-document section for word counts; heading navigation reports that no section heading exists.
+
+## Document map
+
+`:NovelistDocumentMap` opens a navigable outline of the current buffer in a vertical split while keeping the source visible. The outline uses a dedicated scratch buffer; re-running the command rebuilds it, and there is no live edit tracking.
+
+Outline rows show indentation for nesting, a concise label, and the source line number in brackets. Listed elements are:
+
+- headings (`#` through `######`) as a hierarchy;
+- fenced code blocks, list items, blockquotes, and tables when Markdown Tree-sitter parsing succeeds for the buffer;
+- configured standalone marker lines, found with the same line parser used by `:NovelistMarkers`, whether or not Tree-sitter is available.
+
+Put the cursor on a row and press `Enter` (`<CR>`) to switch to the source buffer and jump to its source line. If the source buffer no longer exists, the jump is skipped with a warning. Running `:NovelistDocumentMap` from the outline itself warns instead of nesting another split.
+
+`novelist` does not install or configure Tree-sitter or any parser. If the Tree-sitter API or a Markdown parser is unavailable, or parsing fails, the outline falls back to headings plus markers and shows a notice that richer Markdown structure is unavailable. Installing a Markdown parser is optional and owned by you.
+
+## Keymaps (opt-in)
+
+`novelist` installs no keymaps by default. Opt in to the suggested preset explicitly:
+
+```lua
+require('novelist').setup({
+  keymaps = { preset = 'suggested' },
+})
+```
+
+The suggested preset installs global Normal-mode mappings:
+
+| Action ID | Default key | Command |
+| --- | --- | --- |
+| `scene_next` | `<leader>nn` | `:NovelistSceneNext` |
+| `scene_prev` | `<leader>np` | `:NovelistScenePrev` |
+| `word_count` | `<leader>nw` | `:NovelistWordCount` |
+| `markers` | `<leader>nm` | `:NovelistMarkers` |
+| `document_map` | `<leader>no` | `:NovelistDocumentMap` |
+
+Customize each action with `lhs` (key), `mode` (a single mode string, default `n`), and `desc` (description), or disable one action with `false`:
+
+```lua
+require('novelist').setup({
+  keymaps = {
+    preset = 'suggested',
+    mappings = {
+      scene_prev = { lhs = '<leader>nb' }, -- move one key
+      word_count = { mode = 'i', desc = 'count words' },
+      markers = false, -- keep <leader>nm free
+    },
+  },
+})
+```
+
+Existing user or other-plugin mappings are never overwritten: a conflicting suggested key is skipped and reported with a warning, while the other actions still install. Calling `setup()` again updates or removes only mappings Novelist installed, so repeated configuration does not duplicate maps and unrelated mappings are left alone.
 
 ## Markers
 
@@ -159,6 +214,10 @@ Manual validation on Neovim 0.12+ remains a release gate unless it is actually r
 7. Run `:NovelistSceneNext` and `:NovelistScenePrev` from different lines and confirm cursor movement between headings.
 8. Run `:NovelistMarkers` and `:NovelistMarkers todo`; confirm matching lines appear in quickfix and that filtering works.
 9. Optionally set `vim.b.novelist_disable = true` before applying a supported filetype in a new buffer and confirm prose settings are skipped.
+10. Run `:NovelistDocumentMap` in a Markdown buffer with a Markdown Tree-sitter parser installed (parser setup is yours and optional) and confirm the outline opens in a vertical split beside the source with heading hierarchy, the richer Markdown rows, and source line numbers.
+11. Move through the outline with `Enter` on several rows and confirm the cursor lands on the matching source line; edit the source, confirm the outline is unchanged until re-run, then re-run `:NovelistDocumentMap` and confirm it refreshes.
+12. Repeat the document-map check in a plain-text buffer or with no Markdown parser available and confirm the headings-only outline opens with the reduced-structure notice.
+13. Optionally configure `keymaps = { preset = 'suggested' }` and confirm the five `<leader>n?` mappings, then check one `lhs`/`mode`/`desc` override and one `false` disable; confirm plain `setup()` leaves those keys unmapped.
 
 ## Automated checks
 
