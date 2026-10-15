@@ -17,7 +17,7 @@ Resume from this file and `planning/EXECUTION_PLAN_2.md`.
 | Wave | Task | Status | Notes |
 |---|---|---|---|
 | 1 | 2.1.1 Document structure model with optional Tree-sitter | complete | report below |
-| 2 | 2.2.1 Scratch outline UI and document-map command | pending | Depends on 2.1.1 |
+| 2 | 2.2.1 Scratch outline UI and document-map command | complete | report below |
 | 3 | 2.3.1 Opt-in suggested mapping preset | pending | Depends on 2.2.1 |
 | 4 | 2.4.1 Documentation and manual outline validation | pending | Depends on 2.3.1 |
 
@@ -36,3 +36,14 @@ Maximum concurrent workers: 2. Tasks are sequential by wave; full suite and docs
 - Test command: `./tests/run.sh` -> `Tests: 30 passed, 0 failed` (22 baseline + 8 new; includes parser-present fake-tree, fence-suppression, markers, structures, nil/raising parser, plain-text, and one guarded real-parser case).
 - Deviations from approved plan: none.
 - Gotchas for 2.2.1: Tree-sitter rows are 0-based and converted to 1-based `line`; render indentation from `depth`; use `rich`/`reason` to show the reduced-structure notice; markers never require Tree-sitter.
+
+## 2.2.1
+- Status: complete (awaiting orchestrator verification).
+- Files: `lua/novelist/commands.lua` (+134 lines); `tests/unit/document_map_integration_test.lua` (new, 4 tests). `init.lua` unchanged.
+- Command: `:NovelistDocumentMap` registered in `M.register`; opens/reuses one named scratch buffer `novelist://document-map` (`nofile`, `bufhidden=wipe`) in a vertical split, source kept visible.
+- Render: `indent + label + '  [line]'` rows from `document_map.build`; non-jumpable reduced-structure notice (`rich=false`) and empty-document placeholder; row->{bufnr,line} targets.
+- Interaction: buffer-local `<CR>` (`buf = bufnr`, with `desc`) jumps to the source buffer/window/line, pcall-guarded; stale source notifies; self-run from the outline is guarded.
+- Refresh: re-invocation rebuilds from current lines + markers; no edit autocmd/live tracking.
+- Tests: `./tests/run.sh` -> `Tests: 34 passed, 0 failed` (22 baseline + 8 document_map + 4 integration); parser-present rich test guarded by a parser probe.
+- Deviation: verification retry changed `buffer = bufnr` to `buf = bufnr` in the `<CR>` map (0.12 spelling; both accepted on 0.12.5).
+- Gotchas for 2.3.1: no default global maps; the only new keymap is buffer-local to the plugin-owned outline buffer.
