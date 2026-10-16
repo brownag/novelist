@@ -24,15 +24,47 @@ The dependency-free test suite can run under the available local Neovim runtime,
 
 ## Installation
 
-Install the repository with your preferred Neovim plugin manager, using the manager's normal syntax for a plugin repository. For example, in generic terms:
+`novelist` works as a standalone Neovim plugin. Use your preferred plugin manager's normal repository syntax; lazy.nvim is optional. The runtime plugin calls `require('novelist').setup()` with defaults when it loads. Calling `setup()` yourself is safe and updates the active configuration without installing default keymaps.
+
+### lazy.nvim
+
+A lazy.nvim plugin spec can use `opts` for normal setup and list Novelist's commands for command-triggered loading:
 
 ```lua
--- Add the novelist repository with your plugin manager.
--- Then configure it after the plugin is on 'runtimepath':
-require('novelist').setup()
+{
+  'brownag/novelist',
+  cmd = {
+    'NovelistSceneNext',
+    'NovelistScenePrev',
+    'NovelistWordCount',
+    'NovelistMarkers',
+    'NovelistDocumentMap',
+    'NovelistVale',
+  },
+  opts = {},
+}
 ```
 
-The runtime plugin calls `require('novelist').setup()` with defaults when it loads. Calling `setup()` yourself is safe and updates the active configuration without installing default keymaps.
+lazy.nvim configuration is user-side only; `novelist` has no manager-specific runtime integration or required plugin dependencies. Vale remains optional and is needed only if you use `:NovelistVale`.
+
+### Install with Make
+
+Alternatively, from a checkout of this repository run:
+
+```sh
+make install
+```
+
+This creates a symlink at `site/pack/novelist/start/novelist` below `$XDG_DATA_HOME/nvim` when `XDG_DATA_HOME` is set, or below `$HOME/.local/share/nvim` otherwise. Neovim discovers it through its standard package path; updates to the checkout are immediately visible through the link. To remove it, run `make uninstall` from the same checkout.
+
+Set `INSTALL_DIR` to override the full destination path for either target, for example:
+
+```sh
+make install INSTALL_DIR="$HOME/.local/share/nvim/site/pack/novelist/start/novelist"
+make uninstall INSTALL_DIR="$HOME/.local/share/nvim/site/pack/novelist/start/novelist"
+```
+
+Installation is idempotent when the destination already links to this checkout. It refuses to replace any other existing file, directory, or symlink. Uninstall removes only a symlink to this checkout and leaves any unrelated destination untouched. The Make targets install or remove the local package link; they do not configure a plugin manager. After installation and runtimepath setup, open the help with `:help novelist`.
 
 ## Configuration
 
