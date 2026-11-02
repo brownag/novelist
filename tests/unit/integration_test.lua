@@ -238,6 +238,29 @@ h.test('marker command populates quickfix with filename line text and opens only
   end, { name = filename, close_quickfix = true })
 end)
 
+h.test('marker listing keeps focus in the source window so a filter can follow', function()
+  require_fresh_novelist()
+
+  with_buffer({ '# One', '@who: Mira', 'Body', '@todo: Revise ending' }, function(bufnr)
+    local source_win = vim.api.nvim_get_current_win()
+
+    vim.cmd('NovelistMarkers')
+    h.assert_equal(2, #vim.fn.getqflist())
+    h.assert_true(qf_window_count() > 0)
+    h.assert_equal(source_win, vim.api.nvim_get_current_win(), 'focus should stay in the source window')
+    h.assert_equal(bufnr, vim.api.nvim_get_current_buf())
+
+    vim.cmd('NovelistMarkers todo')
+    local items = vim.fn.getqflist()
+    h.assert_equal(1, #items)
+    h.assert_equal(4, items[1].lnum)
+    h.assert_equal('@todo: Revise ending', items[1].text)
+
+    vim.cmd('cclose')
+    vim.fn.setqflist({}, 'r')
+  end, { close_quickfix = true })
+end)
+
 h.test('setup installs no default keymaps', function()
   local before = keymap_count()
   require_fresh_novelist()
@@ -538,4 +561,20 @@ h.test('closed invoking window leaves unrelated location lists unchanged', funct
   if not ok then
     error(err, 0)
   end
+end)
+
+h.test('plugin exposes a semver version and NovelistVersion reports it', function()
+  local novelist = require_fresh_novelist()
+
+  h.assert_true(type(novelist.version) == 'string')
+  h.assert_true(novelist.version:match('^%d+%.%d+%.%d+$') ~= nil, 'version must be MAJOR.MINOR.PATCH')
+
+  local commands = vim.api.nvim_get_commands({ builtin = false })
+  h.assert_true(commands.NovelistVersion ~= nil)
+
+  local messages = capture_notifications(function()
+    vim.cmd('NovelistVersion')
+  end)
+  h.assert_equal(1, #messages)
+  h.assert_equal('novelist ' .. novelist.version, messages[1].message)
 end)

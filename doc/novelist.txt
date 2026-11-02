@@ -179,7 +179,8 @@ COMMANDS                                                  *novelist-commands*
 :NovelistMarkers [name]
         Put matching marker lines in the quickfix list. Optional [name] filters
         by marker name, such as `todo`. Opens the quickfix window only when
-        matches exist.
+        matches exist, and keeps focus in the source window so a follow-up
+        `:NovelistMarkers [name]` filters the source buffer.
 
                                                         *:NovelistDocumentMap*
 :NovelistDocumentMap
@@ -190,6 +191,11 @@ COMMANDS                                                  *novelist-commands*
 :NovelistVale
         Check the current Markdown or plain-text buffer with a user-installed
         Vale and show findings in the invoking window's location list.
+
+                                                        *:NovelistVersion*
+:NovelistVersion
+        Show the installed novelist version. The same value is available as
+        `require('novelist').version`.
 
 Sections are based on Markdown ATX headings (`#` through `######` followed by
 whitespace). A headingless document is treated as one implicit whole-document

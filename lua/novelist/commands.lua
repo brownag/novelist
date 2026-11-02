@@ -237,7 +237,11 @@ local function list_markers(args)
     return
   end
 
+  -- Keep focus in the source window so follow-up commands still target the
+  -- source buffer, not the quickfix buffer that :copen would otherwise focus.
+  local source_win = vim.api.nvim_get_current_win()
   vim.cmd('copen')
+  vim.api.nvim_set_current_win(source_win)
 end
 
 local function complete_markers(arg_lead)
@@ -381,6 +385,13 @@ function M.register(config_getter)
 
   vim.api.nvim_create_user_command('NovelistVale', vale_command, {
     desc = 'Check the current buffer with Vale',
+    force = true,
+  })
+
+  vim.api.nvim_create_user_command('NovelistVersion', function()
+    notify('novelist ' .. require('novelist').version)
+  end, {
+    desc = 'Show the novelist plugin version',
     force = true,
   })
 end
