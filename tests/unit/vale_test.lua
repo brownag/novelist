@@ -61,6 +61,13 @@ h.test('adapter passes extension and path context and streams buffer lines to st
   end)
 
   assert_list({ '/opt/vale', '--output=JSON', '--ext=.txt' }, unnamed.argv)
+
+  local context_free, context_free_stub = process_result({ code = 0, stdout = '{}', stderr = '' })
+  with_process(context_free_stub, function()
+    vale.check({ executable = 'vale', lines = { 'No context.' } }, function() end)
+  end)
+
+  assert_list({ 'vale', '--output=JSON' }, context_free.argv)
 end)
 
 h.test('parses Vale JSON findings into stable diagnostic records', function()
