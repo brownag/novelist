@@ -2,6 +2,9 @@ local settings = require('novelist.settings')
 
 local M = {}
 
+-- Plugin version (MAJOR.MINOR.PATCH). Single source of truth; keep in sync with releases.
+M.version = '0.1.0'
+
 local augroup_name = 'novelist_settings'
 
 local function copy_value(value)

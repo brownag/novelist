@@ -153,6 +153,7 @@ require('novelist').setup({
 | `:NovelistMarkers [name]` | Put matching marker lines in the quickfix list. Optional `[name]` filters by marker name, such as `todo`. Opens the quickfix window only when matches exist, and keeps focus in the source window. |
 | `:NovelistDocumentMap` | Open the document map outline in a vertical split. |
 | `:NovelistVale` | Check the current Markdown or plain-text buffer with a user-installed Vale; show findings in the invoking window's location list. |
+| `:NovelistVersion` | Show the installed novelist version. The same value is available as `require('novelist').version`. |
 
 Sections are based on Markdown ATX headings (`#` through `######` followed by whitespace). A headingless document is treated as one implicit whole-document section for word counts; heading navigation reports that no section heading exists.
 

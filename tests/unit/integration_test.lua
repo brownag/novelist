@@ -562,3 +562,19 @@ h.test('closed invoking window leaves unrelated location lists unchanged', funct
     error(err, 0)
   end
 end)
+
+h.test('plugin exposes a semver version and NovelistVersion reports it', function()
+  local novelist = require_fresh_novelist()
+
+  h.assert_true(type(novelist.version) == 'string')
+  h.assert_true(novelist.version:match('^%d+%.%d+%.%d+$') ~= nil, 'version must be MAJOR.MINOR.PATCH')
+
+  local commands = vim.api.nvim_get_commands({ builtin = false })
+  h.assert_true(commands.NovelistVersion ~= nil)
+
+  local messages = capture_notifications(function()
+    vim.cmd('NovelistVersion')
+  end)
+  h.assert_equal(1, #messages)
+  h.assert_equal('novelist ' .. novelist.version, messages[1].message)
+end)

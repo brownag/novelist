@@ -387,6 +387,13 @@ function M.register(config_getter)
     desc = 'Check the current buffer with Vale',
     force = true,
   })
+
+  vim.api.nvim_create_user_command('NovelistVersion', function()
+    notify('novelist ' .. require('novelist').version)
+  end, {
+    desc = 'Show the novelist plugin version',
+    force = true,
+  })
 end
 
 return M
