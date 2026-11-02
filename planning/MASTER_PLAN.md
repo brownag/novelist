@@ -33,7 +33,7 @@ The detailed task contracts and original decisions remain in `EXECUTION_PLAN_1.m
 
 ## Current follow-up record
 
-`TODO.md` at repository root records later test-helper/marker cleanup, Neovim 0.12.6 smoke validation, and repository housekeeping follow-ups. Its checkboxes and notes are the latest recorded completion evidence for those items. `STATE_1.md` and the validation sections of ADRs 0001/0002 predate that follow-up and still describe the target-version smoke test as outstanding; treat those statements as historical and verify the newer explicit validation record rather than carrying stale status forward. The old `PROMPT_TEMPLATE_1.md` also says no `AGENTS.md` exists; that guidance is obsolete now that the root `AGENTS.md` is present. Do not reuse the old template unedited for new orchestration.
+`planning/TODO_20261102.md` (archived from the repository-root `TODO.md`) records later test-helper/marker cleanup, Neovim 0.12.6 smoke validation, and repository housekeeping follow-ups. Its checkboxes and notes are the latest recorded completion evidence for those items. `STATE_1.md` and the validation sections of ADRs 0001/0002 predate that follow-up and still describe the target-version smoke test as outstanding; treat those statements as historical and verify the newer explicit validation record rather than carrying stale status forward. The old `PROMPT_TEMPLATE_1.md` also says no `AGENTS.md` exists; that guidance is obsolete now that the root `AGENTS.md` is present. Do not reuse the old template unedited for new orchestration.
 
 Before preparing another wave plan, inspect `git status`, current tests, README/help, accepted ADRs, and the relevant TODOs. Do not assume the historical state is current or reopen completed tasks without evidence of a regression.
 
@@ -57,7 +57,7 @@ The user-selected planning order is **5 → 1 → 2 → 3 → 4**. Each phase is
 
 For each phase, in the order above:
 
-1. Re-read this roadmap, `TODO.md`, current code/tests/docs, `docs/decisions/README.md`, and the accepted ADRs. Check which candidate work is still relevant and avoid assuming prior status is current.
+1. Re-read this roadmap, `planning/TODO_20261102.md`, current code/tests/docs, `docs/decisions/README.md`, and the accepted ADRs. Check which candidate work is still relevant and avoid assuming prior status is current.
 2. Use `/plan-wave` to establish a bounded goal, resolve the phase's choices with the user, and create the next numbered `EXECUTION_PLAN_N.md`, `PROMPT_TEMPLATE_N.md`, and `STATE_N.md` set with dependencies and acceptance criteria.
 3. Do not silently pull candidate work from later phases into an earlier plan. If a dependency requires changing phase order, ask the user and record the decision.
 4. After implementation, update task/state evidence. Revise this master plan only for durable scope/order changes, not transient task status.

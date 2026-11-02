@@ -18,14 +18,14 @@
 - `docs/decisions/` — architecture decision records; `docs/research/` — project research.
 - `planning/` — execution plans, task prompts/state, and task records.
 - `skills/neovim-plugins/` — project-specific Neovim plugin guidance.
-- `TODO.md` — maintained work list; `reports/` and `research_notes/` — supporting research artifacts.
+- `reports/` and `research_notes/` — supporting research artifacts.
 
 ## Workflows
 
 - Add or update automated coverage under `tests/`; run `make test`.
 - Keep user-facing behavior and configuration documented in `README.md` and `doc/novelist.txt`.
 - For release checks, verify help with `make docs-check`, remove generated tags with `make clean` if they are not intended for commit, and perform the documented Neovim 0.12+ manual smoke test.
-- Track planned work in `TODO.md` and use the planning artifacts under `planning/` as applicable.
+- Planning: `plan-first` writes a TODO for simple work (archived as `planning/TODO_YYYYMMDD.md`); `plan-wave` writes execution artifacts (`planning/EXECUTION_PLAN_N.md`, `STATE_N.md`, and per-task todos under `planning/tasks/`) for complex, multipart, or autonomous work.
 
 ## Infrastructure
 
