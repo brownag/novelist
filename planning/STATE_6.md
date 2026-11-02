@@ -13,12 +13,11 @@ Resume from this file and `planning/EXECUTION_PLAN_6.md`.
 ## Wave board
 | Wave | Task | Status | Notes |
 |---|---|---|---|
-| 1 | 6.1.1 Run the Neovim 0.12+ smoke gate and record results | failed (gate open) | Stopped at step 8 per failure policy; steps 9–17 not run |
+| 1 | 6.1.1 Run the Neovim 0.12+ smoke gate and record results | pass | Attempt 1 failed at step 8; code fix applied; attempt 2 passes scripted 1–17 and user visual check (10–12, 15) |
 
 ## Gate summary
-- Gate status: **OPEN**. Step 8 failed; steps 9–17 `not run`.
-- Steps 1–7: `pass` (scripted).
-- Visual confirmation (steps 10–12, 15): not requested; it applies only after the scripted gate passes.
+- Gate status: **PASS.** Scripted steps 1–17 pass on attempt 2; user confirmed visual steps 10–12 and 15.
+- Attempt 1 failed at step 8 (see `## 6.1.1` below). Attempt 2 ran on the fixed tree.
 
 ## Task reports
 <!-- Append each worker report under its task heading; keep each report <=15 lines. -->
@@ -39,3 +38,20 @@ Resume from this file and `planning/EXECUTION_PLAN_6.md`.
 - `make test`: 49 passed, 0 failed. `git diff --check`: clean.
 - Deviation: none from the approved plan. Micro-TODO carries 15 items (one per step plus setup/cleanup) against the ≤12 guideline; the spec enumerates 17 steps, so it stayed.
 - Gotcha for next attempt: README step 8 needs `wincmd p` (or equivalent) between the two commands, or a code fix. A fix is a separate user-approved task per the decision log.
+
+## 6.1.1 attempt 2 (after fix)
+- Fix: `lua/novelist/commands.lua` `list_markers` re-focuses the source window after `copen`. Test added: `tests/unit/integration_test.lua` "marker listing keeps focus in the source window so a filter can follow". Red before fix, green after.
+- Docs: `README.md` command table and `doc/novelist.txt` `:NovelistMarkers` state that focus stays in the source window.
+- `make test`: 50 passed, 0 failed. `make docs-check`: exit 0. `git diff --check`: clean.
+- Scripted runs (headless, `/usr/bin/nvim` 0.12.6; Vale 3.24.0; fresh `mktemp` fixture, removed):
+  - 1–9 `pass`. Step 6: `section words: 6, document words: 10`. Step 8: unfiltered 2 items; `todo` 1 item (line 4).
+  - 10 `pass` (scripted): outline opens beside source (same top row, different column); rows `Opening [1]`, `@who… [2]`, `@todo… [4]`, `Turn [6]`.
+  - 11 `pass`: Enter lands on each row's line; source edit leaves outline unchanged; re-run shows `Turn [7]`.
+  - 12 `pass`: stubbed parser and plain-text buffer both show `novelist: markdown parser unavailable; showing headings only`.
+  - 13a `pass`: plain `setup()` maps none of the five. 13b `pass`: `suggested` maps five with matching desc/rhs. 13c `pass`: `word_count` override moves to `<leader>nc`; `markers = false` unmaps `<leader>nm`; other three unchanged.
+  - 14 `pass`: fixture only; repo has no `.vale.ini`.
+  - 15 `pass` (scripted): loclist has `Avoid the word 'foobar'.` at line 8; global quickfix unchanged.
+  - 16 `pass` (scripted): unsaved line 9 finding shown; disk file still clean.
+  - 17 `pass` (scripted): `novelist: no Vale findings`; no loclist items; no loclist window.
+- Harness correction (not a product change): step 10's first check asserted a top-level `row` layout. That fails once step 8 leaves a quickfix window below, so the check became geometry (same top row, different columns).
+- Visual check (user): steps 10, 11, 12, 15 confirmed pass. Gate closed.
