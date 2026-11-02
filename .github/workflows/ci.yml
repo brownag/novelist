@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      NVIM_VERSION: v0.12.6
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim ${{ env.NVIM_VERSION }}
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/nvim"
+          curl -fsSL -o "$RUNNER_TEMP/nvim/nvim.tar.gz" \
+            "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/nvim-linux-x86_64.tar.gz"
+          tar -xzf "$RUNNER_TEMP/nvim/nvim.tar.gz" -C "$RUNNER_TEMP/nvim"
+          echo "$RUNNER_TEMP/nvim/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Neovim version
+        run: nvim --version | head -1
+
+      - name: Headless test suite
+        run: make test
+
+      - name: Help documentation check
+        run: make docs-check
