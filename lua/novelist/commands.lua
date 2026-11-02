@@ -237,7 +237,11 @@ local function list_markers(args)
     return
   end
 
+  -- Keep focus in the source window so follow-up commands still target the
+  -- source buffer, not the quickfix buffer that :copen would otherwise focus.
+  local source_win = vim.api.nvim_get_current_win()
   vim.cmd('copen')
+  vim.api.nvim_set_current_win(source_win)
 end
 
 local function complete_markers(arg_lead)

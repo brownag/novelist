@@ -150,7 +150,7 @@ require('novelist').setup({
 | `:NovelistSceneNext` | Move to the next Markdown ATX section heading. Warns if there is no next heading. |
 | `:NovelistScenePrev` | Move to the previous Markdown ATX section heading. Warns if there is no previous heading. |
 | `:NovelistWordCount` | Report current section words and document words with `vim.notify`. |
-| `:NovelistMarkers [name]` | Put matching marker lines in the quickfix list. Optional `[name]` filters by marker name, such as `todo`. Opens the quickfix window only when matches exist. |
+| `:NovelistMarkers [name]` | Put matching marker lines in the quickfix list. Optional `[name]` filters by marker name, such as `todo`. Opens the quickfix window only when matches exist, and keeps focus in the source window. |
 | `:NovelistDocumentMap` | Open the document map outline in a vertical split. |
 | `:NovelistVale` | Check the current Markdown or plain-text buffer with a user-installed Vale; show findings in the invoking window's location list. |
 

@@ -179,7 +179,8 @@ COMMANDS                                                  *novelist-commands*
 :NovelistMarkers [name]
         Put matching marker lines in the quickfix list. Optional [name] filters
         by marker name, such as `todo`. Opens the quickfix window only when
-        matches exist.
+        matches exist, and keeps focus in the source window so a follow-up
+        `:NovelistMarkers [name]` filters the source buffer.
 
                                                         *:NovelistDocumentMap*
 :NovelistDocumentMap
